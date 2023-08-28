@@ -1,9 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Context.sol";
-import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
-import "hardhat/console.sol";
-
+import {Ownable} from "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
 import {FeeReaderErrorCodes} from "./FeeReaderErrorCodes.sol";
 import {IFeeReader} from "./IFeeReader.sol";
 
@@ -16,7 +13,7 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
     address public mellowFeeAddress;
     address public feeDistributor;
 
-    IFeeReader feeReader;
+    IFeeReader public feeReader;
     // Fees
     uint256 public mellowFeePercent;
     uint256 public creatorFeePercent;
@@ -159,7 +156,7 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
         uint256 supply = bitsSupply[bitsSubject];
         require(
             supply > 0 || bitsSubject == msg.sender,
-            "Only the bits' creator can buy the first bit"
+            "Bits creator must buy first bit"
         );
 
         (

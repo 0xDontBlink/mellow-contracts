@@ -1,9 +1,8 @@
 // SPDX-License-Identifier: MIT
 
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Context.sol";
-import { FixedPointMathLib } from "https://github.com/transmissions11/solmate/blob/main/src/utils/FixedPointMathLib.sol";
-import { FeeReaderErrorCodes } from "./FeeReaderErrorCodes.sol";
-
+import {FixedPointMathLib} from "https://github.com/transmissions11/solmate/blob/main/src/utils/FixedPointMathLib.sol";
+import {FeeReaderErrorCodes} from "./FeeReaderErrorCodes.sol";
 
 pragma solidity ^0.8.0;
 
@@ -14,7 +13,10 @@ pragma solidity ^0.8.0;
 contract BitsLinearCurve is FeeReaderErrorCodes {
     using FixedPointMathLib for uint256;
 
-    function getPrice(uint256 supply, uint256 delta) internal pure returns (uint256) {
+    function getPrice(
+        uint256 supply,
+        uint256 delta
+    ) internal pure returns (uint256) {
         if (supply == 0) return 0;
         return (supply * delta);
     }
@@ -63,7 +65,10 @@ contract BitsLinearCurve is FeeReaderErrorCodes {
         // (buy spot price) + (buy spot price + 1*delta) + (buy spot price + 2*delta) + ... + (buy spot price + (n-1)*delta)
         // This is equal to n*(buy spot price) + (delta)*(n*(n-1))/2
         // because we have n instances of buy spot price, and then we sum up from delta to (n-1)*delta
-        inputValue = (numItems * buySpotPrice + (numItems * (numItems - 1) * delta) / 2);
+        inputValue = (numItems *
+            buySpotPrice +
+            (numItems * (numItems - 1) * delta) /
+            2);
 
         // Account for the protocol fee, a flat percentage of the buy amount
         mellowFee = inputValue.mulWadUp(mellowFeeMultiplier);
@@ -78,7 +83,7 @@ contract BitsLinearCurve is FeeReaderErrorCodes {
         error = Error.OK;
     }
 
-    // Test: 
+    // Test:
     // Bits Supply: 30
     // Delta: 100000000000000000
     // CreatorFee: 5000000000000000
@@ -128,7 +133,11 @@ contract BitsLinearCurve is FeeReaderErrorCodes {
         // If we sell n items, then the total sale amount is:
         // (spot price) + (spot price - 1*delta) + (spot price - 2*delta) + ... + (spot price - (n-1)*delta)
         // This is equal to n*(spot price) - (delta)*(n*(n-1))/2
-        outputValue = numItems * spotPrice - (numItems * (numItems - 1) * delta) / 2;
+        outputValue =
+            numItems *
+            spotPrice -
+            (numItems * (numItems - 1) * delta) /
+            2;
 
         // Account for the protocol fee, a flat percentage of the sell amount
         mellowFee = outputValue.mulWadUp(mellowFeeMultiplier);

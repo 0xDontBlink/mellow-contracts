@@ -1,0 +1,3 @@
+ds-test/=lib/clones-with-immutable-args/lib/ds-test/src/
+solmate/=lib/solmate/src/
+stringutils/=lib/foundry-huff/lib/solidity-stringutils/
