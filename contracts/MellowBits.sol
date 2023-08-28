@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-import {Ownable} from "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {FeeReaderErrorCodes} from "./FeeReaderErrorCodes.sol";
 import {IFeeReader} from "./IFeeReader.sol";
 
@@ -20,8 +20,6 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
     uint256 public reflectionFeePercent;
 
     uint256 public delta;
-
-    constructor() Ownable(_msgSender()) {}
 
     event Trade(
         address trader,

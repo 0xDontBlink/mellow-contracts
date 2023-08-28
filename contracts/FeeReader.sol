@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-import {FixedPointMathLib} from "https://github.com/transmissions11/solmate/blob/main/src/utils/FixedPointMathLib.sol";
+import {FixedPointMathLib} from "solmate/src/utils/FixedPointMathLib.sol";
 import {FeeReaderErrorCodes} from "./FeeReaderErrorCodes.sol";
 
 pragma solidity ^0.8.20;
