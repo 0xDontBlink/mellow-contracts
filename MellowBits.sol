@@ -4,110 +4,276 @@ import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contr
 import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
-import { IFeeReader } from "./IFeeReader.sol";
+import {FeeReaderErrorCodes} from "./FeeReaderErrorCodes.sol";
+import {IFeeReader} from "./IFeeReader.sol";
 
 pragma solidity ^0.8.20;
 
-contract MellowBits is Ownable {
+/**
+ * @author addo_xyz
+ */
+contract MellowBits is Ownable, FeeReaderErrorCodes {
     address public mellowFeeAddress;
-    IFeeReader feeReaderAddress;
+    address public feeDistributor;
+
+    IFeeReader feeReader;
     // Fees
     uint256 public mellowFeePercent;
     uint256 public creatorFeePercent;
     uint256 public reflectionFeePercent;
 
-    uint256 public delta = 600000000000000; //approx $20 per share for testing
+    uint256 public delta;
 
-    constructor() Ownable(_msgSender()){}
+    constructor() Ownable(_msgSender()) {}
 
-    event Trade(address trader, address subject, bool isBuy, uint256 bitAmount, uint256 ethAmount, uint256 mellowEthAmount, uint256 creatorEthAmount, uint256 supply);
+    event Trade(
+        address trader,
+        address subject,
+        bool isBuy,
+        uint256 bitAmount,
+        uint256 ethAmount,
+        uint256 mellowEthAmount,
+        uint256 creatorEthAmount,
+        uint256 reflectionEthAmount,
+        uint256 supply
+    );
+
+    event CreatorFeeUpdated(uint256 fee);
+    event MellowFeeUpdated(uint256 fee);
+    event ReflectionFeeUpdated(uint256 fee);
+    event FeeReaderUpdated(IFeeReader feeReader);
+    event FeeDistributorAddressUpdated(address newAddress);
+    event DeltaUpdated(uint256 delta);
+
+    error BuyCalculationFailed(Error code);
+    error SellCalculationFailed(Error code);
 
     // Subject => (Holder => Balance)
-    mapping(address => mapping(address => uint256)) public sharesBalance;
+    mapping(address => mapping(address => uint256)) public bitsBalance;
 
-    // SharesSubject => Supply
-    mapping(address => uint256) public sharesSupply;
+    // BitsSubject => Supply
+    mapping(address => uint256) public bitsSupply;
 
-    function getPrice(uint256 supply, uint256 amount) public view returns (uint256) {
-        if (supply == 0) return delta * amount;
-        return (supply * delta);
-    }
-
-    function getBuyPrice(address sharesSubject, uint256 amount) public view returns (uint256) {
-        (,uint256 spotPrice,,,,) 
-            = feeReaderAddress.getBuyInfo(sharesSupply[sharesSubject], delta, amount, creatorFeePercent, mellowFeePercent);
+    function getBuyPrice(
+        address bitsSubject,
+        uint256 amount
+    ) public view returns (uint256) {
+        (Error error, uint256 spotPrice, , , , , ) = feeReader.getBuyInfo(
+            bitsSupply[bitsSubject],
+            delta,
+            amount,
+            creatorFeePercent,
+            mellowFeePercent,
+            reflectionFeePercent
+        );
+        if (error != Error.OK) revert BuyCalculationFailed(error);
         return spotPrice;
     }
 
-    function getBuyPriceAfterFee(address sharesSubject, uint256 amount) public view returns (uint256) {
-        uint256 supply = sharesSupply[sharesSubject];
-        
-        (,,, uint256 inputValue,,) 
-            = feeReaderAddress.getBuyInfo(supply, delta, amount, creatorFeePercent, mellowFeePercent);
+    function getBuyPriceAfterFee(
+        address bitsSubject,
+        uint256 amount
+    ) public view returns (uint256) {
+        uint256 supply = bitsSupply[bitsSubject];
+
+        (Error error, , , uint256 inputValue, , , ) = feeReader.getBuyInfo(
+            supply,
+            delta,
+            amount,
+            creatorFeePercent,
+            mellowFeePercent,
+            reflectionFeePercent
+        );
+
+        if (error != Error.OK) revert BuyCalculationFailed(error);
+
         return inputValue;
     }
 
-   function getSellPrice(address sharesSubject, uint256 amount) public view returns (uint256) {
-        (,uint256 spotPrice,,,,) 
-            = feeReaderAddress.getBuyInfo(sharesSupply[sharesSubject], delta, amount, creatorFeePercent, mellowFeePercent);
+    function getSellPrice(
+        address bitsSubject,
+        uint256 amount
+    ) public view returns (uint256) {
+        (Error error, uint256 spotPrice, , , , , ) = feeReader.getBuyInfo(
+            bitsSupply[bitsSubject],
+            delta,
+            amount,
+            creatorFeePercent,
+            mellowFeePercent,
+            reflectionFeePercent
+        );
+        if (error != Error.OK) revert SellCalculationFailed(error);
         return spotPrice;
     }
 
-    function getSellPriceAfterFee(address sharesSubject, uint256 amount) public view returns (uint256) {
-        uint256 price = getSellPrice(sharesSubject, amount);
-        uint256 mellowFee = price * mellowFeePercent / 1 ether;
-        uint256 subjectFee = price * creatorFeePercent / 1 ether;
-        return price - mellowFee - subjectFee;
+    function getSellPriceAfterFee(
+        address bitsSubject,
+        uint256 amount
+    ) public view returns (uint256) {
+        uint256 supply = bitsSupply[bitsSubject];
+
+        (Error error, , , uint256 outputValue, , , ) = feeReader.getSellInfo(
+            supply,
+            delta,
+            amount,
+            creatorFeePercent,
+            mellowFeePercent,
+            reflectionFeePercent
+        );
+        if (error != Error.OK) revert SellCalculationFailed(error);
+        return outputValue;
     }
 
-    function buyShares(address sharesSubject, uint256 amount) public payable {
-        uint256 supply = sharesSupply[sharesSubject];
-        require(supply > 0 || sharesSubject == msg.sender, "Only the bits' creator can buy the first share");
-        uint256 price = getPrice(supply, amount);
-        uint256 mellowFee = price * mellowFeePercent / 1 ether;
-        uint256 subjectFee = price * creatorFeePercent / 1 ether;
-        require(msg.value >= price + mellowFee + subjectFee, "Insufficient payment");
-        sharesBalance[sharesSubject][msg.sender] = sharesBalance[sharesSubject][msg.sender] + amount;
-        sharesSupply[sharesSubject] = supply + amount;
-        emit Trade(msg.sender, sharesSubject, true, amount, price, mellowFee, subjectFee, supply + amount);
-        (bool success1, ) = mellowFeeAddress.call{value: mellowFee}("");
-        (bool success2, ) = sharesSubject.call{value: subjectFee}("");
-        require(success1 && success2, "Unable to send funds");
+    function _calculateFees(
+        uint256 price
+    )
+        private
+        view
+        returns (uint256 mellowFee, uint256 creatorFee, uint256 reflectionFee)
+    {
+        mellowFee = (price * mellowFeePercent) / 1 ether;
+        creatorFee = (price * creatorFeePercent) / 1 ether;
+        reflectionFee = (price * reflectionFeePercent) / 1 ether;
     }
 
-    function sellShares(address sharesSubject, uint256 amount) public payable {
-        uint256 supply = sharesSupply[sharesSubject];
+    function _transferFees(
+        uint256 mellowFee,
+        uint256 reflectionFee,
+        uint256 creatorFee,
+        address bitsSubject
+    ) private {
+        (bool mellowFeeTransfer, ) = mellowFeeAddress.call{value: mellowFee}(
+            ""
+        );
+        (bool reflectionFeeTransfer, ) = feeDistributor.call{
+            value: reflectionFee
+        }("");
+        (bool creatorFeeTransfer, ) = bitsSubject.call{value: creatorFee}("");
+        require(
+            mellowFeeTransfer && creatorFeeTransfer && reflectionFeeTransfer,
+            "Unable to send funds"
+        );
+    }
+
+    function buyBits(address bitsSubject, uint256 amount) public payable {
+        uint256 supply = bitsSupply[bitsSubject];
+        require(
+            supply > 0 || bitsSubject == msg.sender,
+            "Only the bits' creator can buy the first bit"
+        );
+
+        (
+            ,
+            uint256 price,
+            ,
+            uint256 inputValue,
+            uint256 creatorFee,
+            uint256 mellowFee,
+            uint256 reflectionFee
+        ) = feeReader.getBuyInfo(
+                supply,
+                delta,
+                amount,
+                creatorFeePercent,
+                mellowFeePercent,
+                reflectionFeePercent
+            );
+
+        require(msg.value >= inputValue, "Insufficient payment");
+
+        bitsBalance[bitsSubject][msg.sender] =
+            bitsBalance[bitsSubject][msg.sender] +
+            amount;
+        bitsSupply[bitsSubject] = supply + amount;
+
+        emit Trade(
+            msg.sender,
+            bitsSubject,
+            true,
+            amount,
+            price,
+            mellowFee,
+            creatorFee,
+            reflectionFee,
+            supply + amount
+        );
+
+        _transferFees(mellowFee, reflectionFee, creatorFee, bitsSubject);
+    }
+
+    function sellBits(address bitsSubject, uint256 amount) public payable {
+        uint256 supply = bitsSupply[bitsSubject];
         require(supply > amount, "Cannot sell the last bit");
-        uint256 price = getPrice(supply - amount, amount);
-        uint256 mellowFee = price * mellowFeePercent / 1 ether;
-        uint256 subjectFee = price * creatorFeePercent / 1 ether;
-        require(sharesBalance[sharesSubject][msg.sender] >= amount, "Insufficient bits");
-        sharesBalance[sharesSubject][msg.sender] = sharesBalance[sharesSubject][msg.sender] - amount;
-        sharesSupply[sharesSubject] = supply - amount;
-        emit Trade(msg.sender, sharesSubject, false, amount, price, mellowFee, subjectFee, supply - amount);
-        (bool success1, ) = msg.sender.call{value: price - mellowFee - subjectFee}("");
-        (bool success2, ) = mellowFeeAddress.call{value: mellowFee}("");
-        (bool success3, ) = sharesSubject.call{value: subjectFee}("");
-        require(success1 && success2 && success3, "Unable to send funds");
+
+        uint256 price = feeReader.getPrice(supply - amount, delta);
+        (
+            uint256 mellowFee,
+            uint256 creatorFee,
+            uint256 reflectionFee
+        ) = _calculateFees(price);
+
+        require(
+            bitsBalance[bitsSubject][msg.sender] >= amount,
+            "Insufficient bits"
+        );
+        bitsBalance[bitsSubject][msg.sender] =
+            bitsBalance[bitsSubject][msg.sender] -
+            amount;
+        bitsSupply[bitsSubject] = supply - amount;
+
+        emit Trade(
+            msg.sender,
+            bitsSubject,
+            false,
+            amount,
+            price,
+            mellowFee,
+            creatorFee,
+            reflectionFee,
+            supply - amount
+        );
+
+        (bool senderTransfer, ) = msg.sender.call{
+            value: price - mellowFee - creatorFee - reflectionFee
+        }("");
+        require(senderTransfer, "Unable to send funds");
+
+        _transferFees(mellowFee, reflectionFee, creatorFee, bitsSubject);
     }
 
-   function setFeeAddress(address _feeAddress) public onlyOwner {
+    function setMellowFeeAddress(address _feeAddress) public onlyOwner {
         mellowFeeAddress = _feeAddress;
     }
 
-    function setFeeReaderAddress(IFeeReader _feeReaderAddress) public onlyOwner {
-        feeReaderAddress = _feeReaderAddress;
+    function setFeeReader(IFeeReader _feeReader) public onlyOwner {
+        feeReader = _feeReader;
+        emit FeeReaderUpdated(_feeReader);
+    }
+
+    function setFeeDistributor(
+        address _feeDistributorAddress
+    ) public onlyOwner {
+        feeDistributor = _feeDistributorAddress;
+        emit FeeDistributorAddressUpdated(_feeDistributorAddress);
     }
 
     function setMellowFeePercent(uint256 _feePercent) public onlyOwner {
         mellowFeePercent = _feePercent;
+        emit MellowFeeUpdated(_feePercent);
+    }
+
+    function setReflectionFeePercent(uint256 _feePercent) public onlyOwner {
+        reflectionFeePercent = _feePercent;
+        emit ReflectionFeeUpdated(_feePercent);
     }
 
     function setCreatorFeePercent(uint256 _feePercent) public onlyOwner {
         creatorFeePercent = _feePercent;
+        emit CreatorFeeUpdated(_feePercent);
     }
 
     function setDeltaAmount(uint256 _delta) public onlyOwner {
         delta = _delta;
+        emit CreatorFeeUpdated(_delta);
     }
 }

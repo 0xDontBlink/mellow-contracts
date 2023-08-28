@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.20;
+pragma solidity 0.8.17;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
@@ -27,17 +27,11 @@ contract CumulativeFeeDistributor is Ownable, ICumulativeFeeDistributor {
         bytes32 expectedMerkleRoot,
         bytes32[] calldata merkleProof
     ) external override {
-        require(
-            merkleRoot == expectedMerkleRoot,
-            "CMD: Merkle root was updated"
-        );
+        require(merkleRoot == expectedMerkleRoot, "CMD: Merkle root was updated");
 
         // Verify the merkle proof
         bytes32 leaf = keccak256(abi.encodePacked(account, cumulativeAmount));
-        require(
-            _verifyAsm(merkleProof, expectedMerkleRoot, leaf),
-            "CMD: Invalid proof"
-        );
+        require(_verifyAsm(merkleProof, expectedMerkleRoot, leaf), "CMD: Invalid proof");
 
         // Mark it claimed
         uint256 preclaimed = cumulativeClaimed[account];
@@ -54,22 +48,14 @@ contract CumulativeFeeDistributor is Ownable, ICumulativeFeeDistributor {
     }
 
     // Experimental assembly optimization
-    function _verifyAsm(
-        bytes32[] calldata proof,
-        bytes32 root,
-        bytes32 leaf
-    ) private pure returns (bool valid) {
+    function _verifyAsm(bytes32[] calldata proof, bytes32 root, bytes32 leaf) private pure returns (bool valid) {
         // solhint-disable-next-line no-inline-assembly
         assembly {
             let mem1 := mload(0x40)
             let mem2 := add(mem1, 0x20)
             let ptr := proof.offset
 
-            for {
-                let end := add(ptr, mul(0x20, proof.length))
-            } lt(ptr, end) {
-                ptr := add(ptr, 0x20)
-            } {
+            for { let end := add(ptr, mul(0x20, proof.length)) } lt(ptr, end) { ptr := add(ptr, 0x20) } {
                 let node := calldataload(ptr)
 
                 switch lt(leaf, node)
@@ -89,7 +75,10 @@ contract CumulativeFeeDistributor is Ownable, ICumulativeFeeDistributor {
         }
     }
 
-    function testnetClaim(address account, uint256 amount) external onlyOwner {
+    function testnetClaim(
+        address account,
+        uint256 amount
+    ) external {
         // Send the funds, this is just for testnet - to be removed for mainnet
         unchecked {
             (bool sent, ) = payable(account).call{value: amount}("");
@@ -98,10 +87,8 @@ contract CumulativeFeeDistributor is Ownable, ICumulativeFeeDistributor {
         }
     }
 
-    function emergencyWithdraw(
-        address _token,
-        uint256 _amount
-    ) public onlyOwner {
+    function emergencyWithdraw(address _token, uint256 _amount) public onlyOwner
+    {
         IERC20(_token).safeTransfer(_msgSender(), _amount);
     }
 
