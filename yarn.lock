@@ -882,10 +882,6 @@
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.9.3.tgz#00d7a8cf35a475b160b3f0293a6403c511099364"
   integrity sha512-He3LieZ1pP2TNt5JbkPA4PNT9WC3gOTOlDcFGJW4Le4QKqwmiNJCRt44APfxMxvq7OugU/cqYuPcSBzOw38DAg==
 
-"@rari-capital/solmate@github:Rari-Capital/solmate#e7deddf":
-  version "6.2.0"
-  resolved "https://codeload.github.com/Rari-Capital/solmate/tar.gz/e7deddffd5206cdec1d554c5361f529c2a525846"
-
 "@resolver-engine/core@^0.3.3":
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/@resolver-engine/core/-/core-0.3.3.tgz#590f77d85d45bc7ecc4e06c654f41345db6ca967"
