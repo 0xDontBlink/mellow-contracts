@@ -1,5 +1,6 @@
 import { ethers } from 'hardhat';
 import { MellowBits } from '../typechain-types';
+import { ContractRunner } from 'ethers';
 
 async function main() {
   const deploymentAddress = '0x000000000000000000000000000000000000dead';
@@ -35,30 +36,46 @@ async function main() {
   await bits.setMellowFeeAddress(deploymentAddress);
   await bits.setFeeReader(feeReaderAddress);
 
-  const [owner] = await ethers.getSigners();
+  const [owner, second] = await ethers.getSigners();
 
-  await purchaseBits(bits, owner.address, 1);
-  await purchaseBits(bits, owner.address, 3);
-  await sellBits(bits, owner.address, 1);
-  await purchaseBits(bits, owner.address, 5);
-  await sellBits(bits, owner.address, 3);
+  const accounts = await ethers.getSigners();
+  const numberToLoop = 10;
+  await purchaseBits(bits, owner.address, owner, 1);
+  for (let i = 0; i < 10; i++) {
+    const account = accounts[randomInt(0, numberToLoop)];
+    await purchaseBits(bits, owner.address, account, 1);
+    await purchaseBits(bits, owner.address, account, 3);
+    await sellBits(bits, owner.address, account, 1);
+    await purchaseBits(bits, owner.address, account, 5);
+    await sellBits(bits, owner.address, account, 3);
+  }
+}
+
+function randomInt(min: number, max: number) {
+  // min and max included
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 const purchaseBits = async (
   bits: MellowBits,
-  address: string,
+  creator: string,
+  from: ContractRunner,
   amount: number
 ) => {
-  const inputValue = await bits.getBuyPriceAfterFee(address, amount);
-  const buy = await bits.buyBits(address, amount, {
+  const inputValue = await bits.getBuyPriceAfterFee(creator, amount);
+  const buy = await bits.connect(from).buyBits(creator, amount, {
     value: inputValue,
   });
 };
 
-const sellBits = async (bits: MellowBits, address: string, amount: number) => {
-  const inputValue = await bits.getSellPriceAfterFee(address, amount);
-  console.log(inputValue);
-  const buy = await bits.sellBits(address, amount, {
+const sellBits = async (
+  bits: MellowBits,
+  creator: string,
+  from: ContractRunner,
+  amount: number
+) => {
+  const inputValue = await bits.getSellPriceAfterFee(creator, amount);
+  const sell = await bits.connect(from).sellBits(creator, amount, {
     value: inputValue,
   });
 };
