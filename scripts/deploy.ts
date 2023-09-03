@@ -22,10 +22,10 @@ async function main() {
   console.log('FeeReader deployed: ' + feeReaderAddress);
 
   //Set BITS fee and delta params
-  const delta = ethers.parseEther('0.001'); //0.000006
-  const creatorFee = ethers.parseEther('0.2'); //%
-  const mellowFee = ethers.parseEther('0.2'); //%
-  const reflectionFee = ethers.parseEther('0.2'); //%
+  const delta = ethers.parseEther('0.000000005'); //0.0000000006
+  const creatorFee = ethers.parseEther('0.02'); //%
+  const mellowFee = ethers.parseEther('0.02'); //%
+  const reflectionFee = ethers.parseEther('0.02'); //%
 
   await bits.setDeltaAmount(delta);
   await bits.setCreatorFeePercent(creatorFee);
@@ -36,18 +36,29 @@ async function main() {
   await bits.setMellowFeeAddress(deploymentAddress);
   await bits.setFeeReader(feeReaderAddress);
 
-  const [owner, second] = await ethers.getSigners();
+  const [owner] = await ethers.getSigners();
 
   const accounts = await ethers.getSigners();
   const numberToLoop = 10;
   await purchaseBits(bits, owner.address, owner, 1);
+  // 1000 * 10
   for (let i = 0; i < 10; i++) {
     const account = accounts[randomInt(0, numberToLoop)];
-    await purchaseBits(bits, owner.address, account, 1);
-    await purchaseBits(bits, owner.address, account, 3);
-    await sellBits(bits, owner.address, account, 1);
-    await purchaseBits(bits, owner.address, account, 5);
-    await sellBits(bits, owner.address, account, 3);
+    await purchaseBits(bits, owner.address, account, 1000);
+    await purchaseBits(bits, owner.address, account, 1000);
+    await purchaseBits(bits, owner.address, account, 1000);
+    await purchaseBits(bits, owner.address, account, 1000);
+    await purchaseBits(bits, owner.address, account, 1000);
+    await purchaseBits(bits, owner.address, account, 1000);
+    await purchaseBits(bits, owner.address, account, 1000);
+    await purchaseBits(bits, owner.address, account, 1000);
+    await purchaseBits(bits, owner.address, account, 1000);
+    await purchaseBits(bits, owner.address, account, 1000);
+
+    // await purchaseBits(bits, owner.address, account, randomInt(50, 300));
+    // await sellBits(bits, owner.address, account, randomInt(50, 300));
+    // await purchaseBits(bits, owner.address, account, randomInt(50, 300));
+    // await sellBits(bits, owner.address, account, randomInt(50, 300));
   }
 }
 
@@ -63,6 +74,7 @@ const purchaseBits = async (
   amount: number
 ) => {
   const inputValue = await bits.getBuyPriceAfterFee(creator, amount);
+  console.log(inputValue);
   const buy = await bits.connect(from).buyBits(creator, amount, {
     value: inputValue,
   });

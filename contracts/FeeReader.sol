@@ -48,6 +48,10 @@ contract FeeReader is FeeReaderErrorCodes {
             uint256 reflectionFee
         )
     {
+        // We allow purchasing the first bit for free (allows enabling trading with zero ETH)
+        if (bitsSupply == 0 && numItems == 1) {
+            return (Error.OK, 0, 0, 0, 0, 0, 0);
+        }
         // We only calculate changes for buying 1 or more NFTs
         if (numItems == 0) {
             return (Error.INVALID_NUMITEMS, 0, 0, 0, 0, 0, 0);
