@@ -3,7 +3,7 @@ import { MellowBits } from '../typechain-types';
 import { ContractRunner } from 'ethers';
 
 async function main() {
-  const deploymentAddress = '0x000000000000000000000000000000000000dead';
+  const deploymentAddress = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
 
   const bits = await ethers.deployContract('MellowBits');
   await bits.waitForDeployment();
@@ -36,29 +36,53 @@ async function main() {
   await bits.setMellowFeeAddress(deploymentAddress);
   await bits.setFeeReader(feeReaderAddress);
 
-  const [owner] = await ethers.getSigners();
+  const [owner, second] = await ethers.getSigners();
 
   const accounts = await ethers.getSigners();
   const numberToLoop = 10;
   await purchaseBits(bits, owner.address, owner, 1);
+
   // 1000 * 10
   for (let i = 0; i < 10; i++) {
-    const account = accounts[randomInt(0, numberToLoop)];
-    await purchaseBits(bits, owner.address, account, 1000);
-    await purchaseBits(bits, owner.address, account, 1000);
-    await purchaseBits(bits, owner.address, account, 1000);
-    await purchaseBits(bits, owner.address, account, 1000);
-    await purchaseBits(bits, owner.address, account, 1000);
-    await purchaseBits(bits, owner.address, account, 1000);
-    await purchaseBits(bits, owner.address, account, 1000);
-    await purchaseBits(bits, owner.address, account, 1000);
-    await purchaseBits(bits, owner.address, account, 1000);
-    await purchaseBits(bits, owner.address, account, 1000);
+    const account = accounts[randomInt(3, numberToLoop)];
+    // await purchaseBits(bits, owner.address, account, 1000);
+    // console.log(creatorFee);
+    // console.log(
+    //   'Balance before ' + (await ethers.provider.getBalance(account))
+    // );
+    // console.log(
+    //   'Mellow Balance: ' +
+    //     (await ethers.provider.getBalance(feeDistributorAddress))
+    // );
+    // await purchaseBits(bits, owner.address, account, 1000);
+    // console.log(
+    //   'Balance after buy ' + (await ethers.provider.getBalance(account))
+    // );
+    // console.log(
+    //   'Mellow Balance: ' +
+    //     (await ethers.provider.getBalance(feeDistributorAddress))
+    // );
+    // await sellBits(bits, owner.address, account, 1000);
+    // console.log(
+    //   'Balance after sell ' + (await ethers.provider.getBalance(account))
+    // );
+    // console.log(
+    //   'Mellow Balance: ' +
+    //     (await ethers.provider.getBalance(feeDistributorAddress))
+    // );
 
-    // await purchaseBits(bits, owner.address, account, randomInt(50, 300));
-    // await sellBits(bits, owner.address, account, randomInt(50, 300));
-    // await purchaseBits(bits, owner.address, account, randomInt(50, 300));
-    // await sellBits(bits, owner.address, account, randomInt(50, 300));
+    // await purchaseBits(bits, owner.address, account, 1000);
+    // await purchaseBits(bits, owner.address, account, 1000);
+    // await purchaseBits(bits, owner.address, account, 1000);
+    // await purchaseBits(bits, owner.address, account, 1000);
+    // await purchaseBits(bits, owner.address, account, 1000);
+    // await purchaseBits(bits, owner.address, account, 1000);
+    // await purchaseBits(bits, owner.address, account, 1000);
+    await purchaseBits(bits, owner.address, account, 500);
+    await purchaseBits(bits, owner.address, account, randomInt(50, 300));
+    await sellBits(bits, owner.address, account, randomInt(50, 500));
+    await purchaseBits(bits, owner.address, account, randomInt(50, 300));
+    await sellBits(bits, owner.address, account, randomInt(50, 300));
   }
 }
 
@@ -86,10 +110,9 @@ const sellBits = async (
   from: ContractRunner,
   amount: number
 ) => {
-  const inputValue = await bits.getSellPriceAfterFee(creator, amount);
-  const sell = await bits.connect(from).sellBits(creator, amount, {
-    value: inputValue,
-  });
+  const outputValue = await bits.getSellPriceAfterFee(creator, amount);
+  console.log(outputValue);
+  const sell = await bits.connect(from).sellBits(creator, amount);
 };
 
 // We recommend this pattern to be able to use async/await everywhere

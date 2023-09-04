@@ -4,6 +4,8 @@ import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {FeeReaderErrorCodes} from "./FeeReaderErrorCodes.sol";
 import {IFeeReader} from "./IFeeReader.sol";
 
+import "hardhat/console.sol";
+
 pragma solidity ^0.8.20;
 
 /**
@@ -89,7 +91,7 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
         address bitsSubject,
         uint256 amount
     ) public view returns (uint256) {
-        (Error error, uint256 spotPrice, , , , , ) = feeReader.getBuyInfo(
+        (Error error, uint256 spotPrice, , , , , ) = feeReader.getSellInfo(
             bitsSupply[bitsSubject],
             delta,
             amount,
@@ -106,7 +108,8 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
         uint256 amount
     ) public view returns (uint256) {
         uint256 supply = bitsSupply[bitsSubject];
-
+        console.log(supply);
+        console.log(msg.sender);
         (Error error, , , uint256 outputValue, , , ) = feeReader.getSellInfo(
             supply,
             delta,
@@ -117,18 +120,6 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
         );
         if (error != Error.OK) revert SellCalculationFailed(error);
         return outputValue;
-    }
-
-    function _calculateFees(
-        uint256 price
-    )
-        private
-        view
-        returns (uint256 mellowFee, uint256 creatorFee, uint256 reflectionFee)
-    {
-        mellowFee = (price * mellowFeePercent) / 1 ether;
-        creatorFee = (price * creatorFeePercent) / 1 ether;
-        reflectionFee = (price * reflectionFeePercent) / 1 ether;
     }
 
     function _transferFees(
@@ -199,18 +190,28 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
     function sellBits(address bitsSubject, uint256 amount) public payable {
         uint256 supply = bitsSupply[bitsSubject];
         require(supply > amount, "Cannot sell the last bit");
-
-        uint256 price = feeReader.getPrice(supply - amount, delta);
-        (
-            uint256 mellowFee,
-            uint256 creatorFee,
-            uint256 reflectionFee
-        ) = _calculateFees(price);
-
         require(
             bitsBalance[bitsSubject][msg.sender] >= amount,
             "Insufficient bits"
         );
+
+        (
+            ,
+            uint256 price,
+            ,
+            uint256 outputValue,
+            uint256 creatorFee,
+            uint256 mellowFee,
+            uint256 reflectionFee
+        ) = feeReader.getSellInfo(
+                supply,
+                delta,
+                amount,
+                creatorFeePercent,
+                mellowFeePercent,
+                reflectionFeePercent
+            );
+
         bitsBalance[bitsSubject][msg.sender] =
             bitsBalance[bitsSubject][msg.sender] -
             amount;
@@ -228,9 +229,7 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
             supply - amount
         );
 
-        (bool senderTransfer, ) = msg.sender.call{
-            value: price - mellowFee - creatorFee - reflectionFee
-        }("");
+        (bool senderTransfer, ) = msg.sender.call{value: outputValue}("");
         require(senderTransfer, "Unable to send funds");
 
         _transferFees(mellowFee, reflectionFee, creatorFee, bitsSubject);
