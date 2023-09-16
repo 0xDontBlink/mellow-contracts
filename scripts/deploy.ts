@@ -40,11 +40,12 @@ async function main() {
 
   const accounts = await ethers.getSigners();
   const numberToLoop = 10;
-  await purchaseBits(bits, owner.address, owner, 1);
+  // await purchaseBits(bits, owner.address, owner, 1);
+  // await purchaseBits(bits, second.address, second, 1);
 
   // 1000 * 10
   for (let i = 0; i < 10; i++) {
-    const account = accounts[randomInt(3, numberToLoop)];
+    // const account = accounts[randomInt(3, numberToLoop)];
     // await purchaseBits(bits, owner.address, account, 1000);
     // console.log(creatorFee);
     // console.log(
@@ -70,7 +71,6 @@ async function main() {
     //   'Mellow Balance: ' +
     //     (await ethers.provider.getBalance(feeDistributorAddress))
     // );
-
     // await purchaseBits(bits, owner.address, account, 1000);
     // await purchaseBits(bits, owner.address, account, 1000);
     // await purchaseBits(bits, owner.address, account, 1000);
@@ -78,11 +78,11 @@ async function main() {
     // await purchaseBits(bits, owner.address, account, 1000);
     // await purchaseBits(bits, owner.address, account, 1000);
     // await purchaseBits(bits, owner.address, account, 1000);
-    await purchaseBits(bits, owner.address, account, 500);
-    await purchaseBits(bits, owner.address, account, randomInt(50, 300));
-    await sellBits(bits, owner.address, account, randomInt(50, 500));
-    await purchaseBits(bits, owner.address, account, randomInt(50, 300));
-    await sellBits(bits, owner.address, account, randomInt(50, 300));
+    // await purchaseBits(bits, owner.address, account, 500);
+    // await purchaseBits(bits, owner.address, account, randomInt(50, 300));
+    // await sellBits(bits, owner.address, account, randomInt(50, 500));
+    // await purchaseBits(bits, owner.address, account, randomInt(50, 300));
+    // await sellBits(bits, owner.address, account, randomInt(50, 300));
   }
 }
 

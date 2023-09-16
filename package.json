@@ -7,7 +7,10 @@
     "lint-sol": "solhint \"contracts/*.sol\"",
     "lint-ts": "eslint \"./test/*.t.sol\"",
     "lint": "npm run lint-sol && npm run lint-ts",
-    "test": "npx hardhat test"
+    "test": "npx hardhat test",
+    "start": "npx hardhat node",
+    "deploy:test": "npx hardhat run --network localhost scripts/deploy.ts",
+    "deploy:test-send": "npx hardhat run --network localhost scripts/sendEth.ts"
   },
   "keywords": [],
   "author": "",
