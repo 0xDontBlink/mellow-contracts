@@ -1,17 +1,21 @@
 // SPDX-License-Identifier: MIT
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {PausableUpgradeable} from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+
 import {FeeReaderErrorCodes} from "./FeeReaderErrorCodes.sol";
 import {IFeeReader} from "./IFeeReader.sol";
-
-import "hardhat/console.sol";
 
 pragma solidity ^0.8.20;
 
 /**
  * @author addo_xyz
  */
-contract MellowBits is Ownable, FeeReaderErrorCodes {
+contract MellowBits is
+    OwnableUpgradeable,
+    PausableUpgradeable,
+    FeeReaderErrorCodes
+{
     address public mellowFeeAddress;
     address public feeDistributor;
 
@@ -22,6 +26,11 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
     uint256 public reflectionFeePercent;
 
     uint256 public delta;
+
+    function initialize() public initializer {
+        __Pausable_init();
+        __Ownable_init();
+    }
 
     event Trade(
         address trader,
@@ -83,7 +92,6 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
         );
 
         if (error != Error.OK) revert BuyCalculationFailed(error);
-
         return inputValue;
     }
 
@@ -108,8 +116,7 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
         uint256 amount
     ) public view returns (uint256) {
         uint256 supply = bitsSupply[bitsSubject];
-        console.log(supply);
-        console.log(msg.sender);
+
         (Error error, , , uint256 outputValue, , , ) = feeReader.getSellInfo(
             supply,
             delta,
@@ -149,7 +156,7 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
         );
 
         (
-            ,
+            Error error,
             uint256 price,
             ,
             uint256 inputValue,
@@ -165,12 +172,14 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
                 reflectionFeePercent
             );
 
+        if (error != Error.OK) revert BuyCalculationFailed(error);
         require(msg.value >= inputValue, "Insufficient payment");
 
         bitsBalance[bitsSubject][msg.sender] =
             bitsBalance[bitsSubject][msg.sender] +
             amount;
-        bitsSupply[bitsSubject] = supply + amount;
+        uint256 increase = supply + amount;
+        bitsSupply[bitsSubject] = increase;
 
         emit Trade(
             msg.sender,
@@ -181,7 +190,7 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
             mellowFee,
             creatorFee,
             reflectionFee,
-            supply + amount
+            increase
         );
 
         _transferFees(mellowFee, reflectionFee, creatorFee, bitsSubject);
@@ -196,7 +205,7 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
         );
 
         (
-            ,
+            Error error,
             uint256 price,
             ,
             uint256 outputValue,
@@ -211,11 +220,13 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
                 mellowFeePercent,
                 reflectionFeePercent
             );
+        if (error != Error.OK) revert SellCalculationFailed(error);
 
         bitsBalance[bitsSubject][msg.sender] =
             bitsBalance[bitsSubject][msg.sender] -
             amount;
-        bitsSupply[bitsSubject] = supply - amount;
+        uint256 decrease = supply - amount;
+        bitsSupply[bitsSubject] = decrease;
 
         emit Trade(
             msg.sender,
@@ -226,7 +237,7 @@ contract MellowBits is Ownable, FeeReaderErrorCodes {
             mellowFee,
             creatorFee,
             reflectionFee,
-            supply - amount
+            decrease
         );
 
         (bool senderTransfer, ) = msg.sender.call{value: outputValue}("");

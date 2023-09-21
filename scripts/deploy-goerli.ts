@@ -1,9 +1,9 @@
-import { ethers, upgrades } from 'hardhat';
+import { ethers } from 'hardhat';
 import { MellowBits } from '../typechain-types';
 import { ContractRunner } from 'ethers';
 
 async function main() {
-  const deploymentAddress = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+  const deploymentAddress = '0x6d475839B944cb4c6e7d7e21DD78eBCC4E4C9310';
 
   const bits = await ethers.deployContract('MellowBits');
   await bits.waitForDeployment();
@@ -24,8 +24,8 @@ async function main() {
   //Set BITS fee and delta params
   const delta = ethers.parseEther('0.0000000006'); //0.0000000006
   const creatorFee = ethers.parseEther('0.04'); //%
-  const mellowFee = ethers.parseEther('0.02'); //%
   const reflectionFee = ethers.parseEther('0.04'); //%
+  const mellowFee = ethers.parseEther('0.02'); //%
 
   await bits.setDeltaAmount(delta);
   await bits.setCreatorFeePercent(creatorFee);
@@ -38,38 +38,9 @@ async function main() {
 
   // const [owner, second] = await ethers.getSigners();
 
-  const accounts = await ethers.getSigners();
-  const ELON = accounts[3];
-  const ADDO = accounts[4];
-  const EPSTEIN = accounts[5];
-  const MRBEAST = accounts[6];
-  const SBF = accounts[7];
+  const [deployer] = await ethers.getSigners();
 
-  const allUsers = [ELON, ADDO];
-
-  // const numberToLoop = 10;
-  // await purchaseBits(bits, owner.address, owner, 1);
-  // await purchaseBits(bits, second.address, second, 1);
-
-  for (var demoUser of allUsers) {
-    await purchaseBits(bits, demoUser.address, demoUser, 1);
-  }
-  for (var demoUser of allUsers) {
-    //Buy 10,000 of each user
-    for (var buyAll of allUsers) {
-      await purchaseBits(bits, buyAll.address, demoUser, 10000);
-    }
-  }
-  // for (let i = 0; i < 300; i++) {
-  //   const buyer = allUsers[randomInt(0, allUsers.length - 1)];
-  //   const creator = allUsers[randomInt(0, allUsers.length - 1)];
-  //   const ran = randomInt(0, 10);
-  //   if (ran >= 7) {
-  //     await sellBits(bits, creator.address, buyer, randomInt(50, 5000));
-  //   } else {
-  //     await purchaseBits(bits, creator.address, buyer, randomInt(50, 5000));
-  //   }
-  // }
+  await purchaseBits(bits, deployer.address, deployer, 1);
 }
 // 1000 * 10
 

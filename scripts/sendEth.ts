@@ -4,8 +4,8 @@ async function main() {
   const [owner, second] = await ethers.getSigners();
 
   await owner.sendTransaction({
-    to: '0xadc19a4a7038d739c22ef05bfa0568665050f56e',
-    value: ethers.parseEther('500'), // Sends exactly 1.0 ether
+    to: '0x29ce25427884c277c61959b0c8b0a1576bf3b18d',
+    value: ethers.parseEther('100'), // Sends exactly 1.0 ether
   });
 }
 

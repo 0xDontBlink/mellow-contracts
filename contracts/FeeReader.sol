@@ -20,14 +20,6 @@ contract FeeReader is FeeReaderErrorCodes {
         return (supply * delta);
     }
 
-    // Test:
-    // Bits Supply: 30
-    // Num items: 5
-    // Delta: 100000000000000000 (0.1 ETH)
-    // CreatorFee: 5000000000000000
-    // mellowFee: 3000000000000000
-    // reflectionFee: 2000000000000000
-    // Expected: 16.632 ETH
     function getBuyInfo(
         uint256 bitsSupply,
         uint256 delta,
@@ -99,14 +91,6 @@ contract FeeReader is FeeReaderErrorCodes {
         error = Error.OK;
     }
 
-    // Test:
-    // Bits Supply: 30
-    // Num items: 5
-    // Delta: 100000000000000000
-    // CreatorFee: 5000000000000000
-    // mellowFee: 2000000000000000
-    // ReflectionFee: 2000000000000000
-    // ExpectedOutput: 13.888 ETH
     function getSellInfo(
         uint256 bitsSupply,
         uint256 delta,

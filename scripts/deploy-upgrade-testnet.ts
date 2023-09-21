@@ -3,10 +3,18 @@ import { MellowBits } from '../typechain-types';
 import { ContractRunner } from 'ethers';
 
 async function main() {
-  const deploymentAddress = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+  const MELLOW_FEE_ADDRESS = '0x6d475839B944cb4c6e7d7e21DD78eBCC4E4C9310';
 
-  const bits = await ethers.deployContract('MellowBits');
+  const bitsFactory = await ethers.getContractFactory('MellowBits');
+  console.log('Deploying Bits Factiory...');
+  const bits = await upgrades.deployProxy(bitsFactory);
   await bits.waitForDeployment();
+
+  console.log(await bits.getAddress());
+  //   console.log(await bitsFactory.getDeployTransaction());
+
+  const proxiedV1 = await bitsFactory.attach(await bits.getAddress());
+
   console.log('BitsContract deployed: ' + (await bits.getAddress()));
 
   const feeDistributor = await ethers.deployContract(
@@ -22,7 +30,7 @@ async function main() {
   console.log('FeeReader deployed: ' + feeReaderAddress);
 
   //Set BITS fee and delta params
-  const delta = ethers.parseEther('0.0000000006'); //0.0000000006
+  const delta = ethers.parseEther('0.0000000005'); //0.0000000005
   const creatorFee = ethers.parseEther('0.04'); //%
   const mellowFee = ethers.parseEther('0.02'); //%
   const reflectionFee = ethers.parseEther('0.04'); //%
@@ -33,17 +41,16 @@ async function main() {
   await bits.setReflectionFeePercent(reflectionFee);
   // Set fee distributor address
   await bits.setFeeDistributor(feeDistributorAddress);
-  await bits.setMellowFeeAddress(deploymentAddress);
+  await bits.setMellowFeeAddress(MELLOW_FEE_ADDRESS);
   await bits.setFeeReader(feeReaderAddress);
+
+  console.log(await bits.mellowFeeAddress);
 
   // const [owner, second] = await ethers.getSigners();
 
   const accounts = await ethers.getSigners();
   const ELON = accounts[3];
   const ADDO = accounts[4];
-  const EPSTEIN = accounts[5];
-  const MRBEAST = accounts[6];
-  const SBF = accounts[7];
 
   const allUsers = [ELON, ADDO];
 
@@ -51,25 +58,40 @@ async function main() {
   // await purchaseBits(bits, owner.address, owner, 1);
   // await purchaseBits(bits, second.address, second, 1);
 
-  for (var demoUser of allUsers) {
-    await purchaseBits(bits, demoUser.address, demoUser, 1);
+  const buy2 = await bits.connect(ELON).buyBits(accounts[0].address, 1, {
+    value: 0,
+  });
+
+  for (let index = 0; index < 3; index++) {
+    const inputValue2 = await bits.getBuyPriceAfterFee(
+      accounts[0].address,
+      1000
+    );
+    const buy2 = await bits.buyBits(accounts[0].address, 1000, {
+      value: inputValue2,
+    });
   }
-  for (var demoUser of allUsers) {
-    //Buy 10,000 of each user
-    for (var buyAll of allUsers) {
-      await purchaseBits(bits, buyAll.address, demoUser, 10000);
-    }
-  }
-  // for (let i = 0; i < 300; i++) {
-  //   const buyer = allUsers[randomInt(0, allUsers.length - 1)];
-  //   const creator = allUsers[randomInt(0, allUsers.length - 1)];
-  //   const ran = randomInt(0, 10);
-  //   if (ran >= 7) {
-  //     await sellBits(bits, creator.address, buyer, randomInt(50, 5000));
-  //   } else {
-  //     await purchaseBits(bits, creator.address, buyer, randomInt(50, 5000));
+  //   for (var demoUser of allUsers) {
+  //     //Buy 10,000 of each user
+  //     for (var buyAll of allUsers) {
+  //       await purchaseBits(
+  //         bits,
+  //         buyAll.address,
+  //         demoUser,
+  //         randomInt(12500, 20000)
+  //       );
+  //     }
   //   }
-  // }
+  //   for (let i = 0; i < 300; i++) {
+  //     const buyer = allUsers[randomInt(0, allUsers.length - 1)];
+  //     const creator = allUsers[randomInt(0, allUsers.length - 1)];
+  //     const ran = randomInt(0, 10);
+  //     if (ran >= 7) {
+  //       await sellBits(bits, creator.address, buyer, randomInt(50, 5000));
+  //     } else {
+  //       await purchaseBits(bits, creator.address, buyer, randomInt(50, 5000));
+  //     }
+  //   }
 }
 // 1000 * 10
 
@@ -79,7 +101,7 @@ function randomInt(min: number, max: number) {
 }
 
 const purchaseBits = async (
-  bits: MellowBits,
+  bits: Contract,
   creator: string,
   from: ContractRunner,
   amount: number
