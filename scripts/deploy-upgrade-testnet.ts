@@ -13,8 +13,6 @@ async function main() {
   console.log(await bits.getAddress());
   //   console.log(await bitsFactory.getDeployTransaction());
 
-  const proxiedV1 = await bitsFactory.attach(await bits.getAddress());
-
   console.log('BitsContract deployed: ' + (await bits.getAddress()));
 
   const feeDistributor = await ethers.deployContract(
@@ -44,33 +42,27 @@ async function main() {
   await bits.setMellowFeeAddress(MELLOW_FEE_ADDRESS);
   await bits.setFeeReader(feeReaderAddress);
 
-  console.log(await bits.mellowFeeAddress);
-
   // const [owner, second] = await ethers.getSigners();
 
-  const accounts = await ethers.getSigners();
-  const ELON = accounts[3];
-  const ADDO = accounts[4];
+  //   const accounts = await ethers.getSigners();
+  //   const ELON = accounts[3];
+  //   const ADDO = accounts[4];
 
-  const allUsers = [ELON, ADDO];
+  //   const allUsers = [ELON, ADDO];
 
-  // const numberToLoop = 10;
-  // await purchaseBits(bits, owner.address, owner, 1);
-  // await purchaseBits(bits, second.address, second, 1);
+  //   // const numberToLoop = 10;
+  //   // await purchaseBits(bits, owner.address, owner, 1);
+  //   // await purchaseBits(bits, second.address, second, 1);
 
-  const buy2 = await bits.connect(ELON).buyBits(accounts[0].address, 1, {
-    value: 0,
-  });
-
-  for (let index = 0; index < 3; index++) {
-    const inputValue2 = await bits.getBuyPriceAfterFee(
-      accounts[0].address,
-      1000
-    );
-    const buy2 = await bits.buyBits(accounts[0].address, 1000, {
-      value: inputValue2,
-    });
-  }
+  //   for (let index = 0; index < 3; index++) {
+  //     const inputValue2 = await bits.getBuyPriceAfterFee(
+  //       accounts[0].address,
+  //       1000
+  //     );
+  //     const buy2 = await bits.buyBits(accounts[0].address, 1000, {
+  //       value: inputValue2,
+  //     });
+  //   }
   //   for (var demoUser of allUsers) {
   //     //Buy 10,000 of each user
   //     for (var buyAll of allUsers) {

@@ -88,15 +88,6 @@ contract CumulativeFeeDistributor is Ownable, ICumulativeFeeDistributor {
         }
     }
 
-    function testnetClaim(address account, uint256 amount) external onlyOwner {
-        // Send the funds, this is just for testnet - to be removed for mainnet
-        unchecked {
-            (bool sent, ) = payable(account).call{value: amount}("");
-            require(sent, "Failed to transfer to account");
-            emit Claimed(account, amount);
-        }
-    }
-
     function emergencyWithdraw(
         address _token,
         uint256 _amount

@@ -152,7 +152,7 @@ contract MellowBits is
         uint256 supply = bitsSupply[bitsSubject];
         require(
             supply > 0 || bitsSubject == msg.sender,
-            "Bits creator must buy first bit"
+            "Creator must buy first bit"
         );
 
         (
