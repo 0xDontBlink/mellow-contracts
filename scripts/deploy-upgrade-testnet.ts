@@ -44,15 +44,15 @@ async function main() {
 
   // const [owner, second] = await ethers.getSigners();
 
-  //   const accounts = await ethers.getSigners();
-  //   const ELON = accounts[3];
-  //   const ADDO = accounts[4];
+  // const accounts = await ethers.getSigners();
+  // const ELON = accounts[3];
+  // const ADDO = accounts[4];
 
-  //   const allUsers = [ELON, ADDO];
+  // const allUsers = [ELON, ADDO];
 
-  //   // const numberToLoop = 10;
-  //   // await purchaseBits(bits, owner.address, owner, 1);
-  //   // await purchaseBits(bits, second.address, second, 1);
+  // const numberToLoop = 10;
+  // await purchaseBits(bitsFactory.attach(bits), owner.address, owner, 1);
+  // await purchaseBits(bits, second.address, second, 1);
 
   //   for (let index = 0; index < 3; index++) {
   //     const inputValue2 = await bits.getBuyPriceAfterFee(
@@ -93,7 +93,7 @@ function randomInt(min: number, max: number) {
 }
 
 const purchaseBits = async (
-  bits: Contract,
+  bits: MellowBits,
   creator: string,
   from: ContractRunner,
   amount: number

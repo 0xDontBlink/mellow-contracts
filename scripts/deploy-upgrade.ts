@@ -3,7 +3,7 @@ import { MellowBits } from '../typechain-types';
 import { ContractRunner } from 'ethers';
 
 async function main() {
-  const MELLOW_FEE_ADDRESS = '0x6d475839B944cb4c6e7d7e21DD78eBCC4E4C9310';
+  const MELLOW_FEE_ADDRESS = '0x4dD4D454BfA77C6D767a3E3dC72a5a8236251d21';
 
   const bitsFactory = await ethers.getContractFactory('MellowBits');
   console.log('Deploying Bits Factiory...');

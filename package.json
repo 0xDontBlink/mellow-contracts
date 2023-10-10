@@ -13,7 +13,7 @@
     "verify:basegoerli": "npx hardhat verify --network basegoerli 0xf988121b2B33b7048c6Bb75502AE4C3956f16377",
     "deploy:test": "npx hardhat run --network localhost scripts/deploy-upgrade-testnet.ts",
     "deploy:test-send": "npx hardhat run --network localhost scripts/sendEth.ts",
-    "deploy:basegoerli": "npx hardhat run --network basegoerli scripts/deploy-goerli.ts",
+    "deploy:basegoerli": "npx hardhat run --network basegoerli scripts/deploy-upgrade-testnet.ts",
     "deploy:test-goerli": "npx hardhat run --network basegoerli scripts/test-goerli.ts"
   },
   "keywords": [],
@@ -45,6 +45,7 @@
     "typescript": "^4.5.5"
   },
   "dependencies": {
+    "@nomicfoundation/hardhat-ledger": "^1.0.1",
     "@nomiclabs/hardhat-ganache": "^2.0.1",
     "@openzeppelin/contracts": "^4.4.2",
     "@openzeppelin/contracts-upgradeable": "^4.4.2",

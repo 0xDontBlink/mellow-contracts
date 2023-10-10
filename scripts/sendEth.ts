@@ -1,11 +1,11 @@
 import { ethers } from 'hardhat';
 
 async function main() {
-  const [owner, second] = await ethers.getSigners();
+  const [owner, second, third] = await ethers.getSigners();
 
   await owner.sendTransaction({
-    to: '0x583849c54a476057c0bc5e04ebc24432d154d447',
-    value: ethers.parseEther('4000'), // Sends exactly 1.0 ether
+    to: '0x597c09bc8da1f5057ff5c3e4a52caf7011b0d648',
+    value: ethers.parseEther('9999'), // Sends exactly 1.0 ether
   });
 }
 

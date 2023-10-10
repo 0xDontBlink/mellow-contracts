@@ -2,6 +2,7 @@ import { HardhatUserConfig } from 'hardhat/config';
 import '@nomicfoundation/hardhat-toolbox';
 import '@openzeppelin/hardhat-upgrades';
 import '@nomiclabs/hardhat-ganache';
+import '@nomicfoundation/hardhat-ledger';
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -30,6 +31,7 @@ const config: HardhatUserConfig = {
       accounts: [
         '0babf5cf9d95db8813026cd4a0a6238542a7fed61fc48b979de41dcddf3e33fe',
       ],
+      //       ledgerAccounts: ['0x4dD4D454BfA77C6D767a3E3dC72a5a8236251d21'],
     },
   },
   etherscan: {
