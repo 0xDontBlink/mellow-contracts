@@ -3,7 +3,7 @@ import { MellowBits } from '../typechain-types';
 import { ContractRunner } from 'ethers';
 
 async function main() {
-  const deploymentAddress = '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199';
+  const deploymentAddress = '0x3f83D44e7c6EF5eb1D3F096f4cb3955AbE92Cf55';
 
   const bits = await ethers.deployContract('MellowBits');
   await bits.waitForDeployment();

@@ -7,6 +7,9 @@ import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {ICumulativeFeeDistributor} from "./ICumulativeFeeDistributor.sol";
 
+/**
+ * @notice Allows anyone to claim a token if they exist in a merkle root.
+ */
 contract CumulativeFeeDistributor is Ownable, ICumulativeFeeDistributor {
     using SafeERC20 for IERC20;
 

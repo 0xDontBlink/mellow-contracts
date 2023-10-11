@@ -279,6 +279,6 @@ contract MellowBits is
 
     function setDeltaAmount(uint256 _delta) public onlyOwner {
         delta = _delta;
-        emit CreatorFeeUpdated(_delta);
+        emit DeltaUpdated(_delta);
     }
 }

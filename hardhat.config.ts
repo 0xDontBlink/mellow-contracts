@@ -24,19 +24,25 @@ const config: HardhatUserConfig = {
     },
     mellowtestnet: {
       url: 'https://localtestnet.mellow.to',
+      gasPrice: 694201337,
     },
     basegoerli: {
       url: 'https://goerli.base.org',
-      gasPrice: 50000000000,
+      gasPrice: 694201337,
       accounts: [
         '0babf5cf9d95db8813026cd4a0a6238542a7fed61fc48b979de41dcddf3e33fe',
       ],
-      //       ledgerAccounts: ['0x4dD4D454BfA77C6D767a3E3dC72a5a8236251d21'],
+    },
+    base: {
+      url: 'https://mainnet.base.org',
+      gasPrice: 694201337,
+      ledgerAccounts: ['0x3f83D44e7c6EF5eb1D3F096f4cb3955AbE92Cf55'],
     },
   },
   etherscan: {
     apiKey: {
       'base-goerli': 'PLACEHOLDER_STRING',
+      base: 'JFCM6J2KRE5KZQAA3S8N29XH37ZZDEQH8J',
     },
     customChains: [
       {

@@ -3,7 +3,7 @@ import { MellowBits } from '../typechain-types';
 import { ContractRunner } from 'ethers';
 
 async function main() {
-  const MELLOW_FEE_ADDRESS = '0x4dD4D454BfA77C6D767a3E3dC72a5a8236251d21';
+  const MELLOW_FEE_ADDRESS = '0x3f83D44e7c6EF5eb1D3F096f4cb3955AbE92Cf55';
 
   const bitsFactory = await ethers.getContractFactory('MellowBits');
   console.log('Deploying Bits Factiory...');
@@ -43,13 +43,13 @@ async function main() {
 
   console.log(await bits.mellowFeeAddress);
 
-  // const [owner, second] = await ethers.getSigners();
+  // // const [owner, second] = await ethers.getSigners();
 
-  const accounts = await ethers.getSigners();
-  const ELON = accounts[3];
-  const ADDO = accounts[4];
+  // const accounts = await ethers.getSigners();
+  // const ELON = accounts[3];
+  // const ADDO = accounts[4];
 
-  const allUsers = [ELON, ADDO];
+  // const allUsers = [ELON, ADDO];
 
   // const numberToLoop = 10;
   // await purchaseBits(bits, owner.address, owner, 1);

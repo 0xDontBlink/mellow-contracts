@@ -1,0 +1,192 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0x962AAe0f6Fa7e476CdFe79740E6640A05D0A24CC",
+    "txHash": "0x3456ff38f5ce6607928aef724a3dc4ac1d92eb148a2e3759ebe2af39ef4aea3a"
+  },
+  "proxies": [
+    {
+      "address": "0x0C884B56fA7Dd33A1F4E8B05e7105217C2456219",
+      "txHash": "0x33ef95e2bf4c4c19ee7b783f12bac5629dfb2e2cf3df74c79885163963aee829",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "1e2d22bb8ae727126e174367fb0480273ddc1d9783d2229a570d34956c5f5ff3": {
+      "address": "0xe57532d6d2c6CB157A81ee3897d9F04cb74f657B",
+      "txHash": "0xa1d39bb3b800722ce3ea5f90773f4f02f9e43ca443a9e7b0c80b0469c87298d0",
+      "layout": {
+        "solcVersion": "0.8.20",
+        "storage": [
+          {
+            "label": "_initialized",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_uint8",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:63",
+            "retypedFrom": "bool"
+          },
+          {
+            "label": "_initializing",
+            "offset": 1,
+            "slot": "0",
+            "type": "t_bool",
+            "contract": "Initializable",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol:68"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_array(t_uint256)50_storage",
+            "contract": "ContextUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol:36"
+          },
+          {
+            "label": "_owner",
+            "offset": 0,
+            "slot": "51",
+            "type": "t_address",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:22"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "52",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "OwnableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol:94"
+          },
+          {
+            "label": "_paused",
+            "offset": 0,
+            "slot": "101",
+            "type": "t_bool",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:29"
+          },
+          {
+            "label": "__gap",
+            "offset": 0,
+            "slot": "102",
+            "type": "t_array(t_uint256)49_storage",
+            "contract": "PausableUpgradeable",
+            "src": "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol:116"
+          },
+          {
+            "label": "mellowFeeAddress",
+            "offset": 0,
+            "slot": "151",
+            "type": "t_address",
+            "contract": "MellowBits",
+            "src": "contracts/MellowBits.sol:19"
+          },
+          {
+            "label": "feeDistributor",
+            "offset": 0,
+            "slot": "152",
+            "type": "t_address",
+            "contract": "MellowBits",
+            "src": "contracts/MellowBits.sol:20"
+          },
+          {
+            "label": "feeReader",
+            "offset": 0,
+            "slot": "153",
+            "type": "t_contract(IFeeReader)2418",
+            "contract": "MellowBits",
+            "src": "contracts/MellowBits.sol:22"
+          },
+          {
+            "label": "mellowFeePercent",
+            "offset": 0,
+            "slot": "154",
+            "type": "t_uint256",
+            "contract": "MellowBits",
+            "src": "contracts/MellowBits.sol:24"
+          },
+          {
+            "label": "creatorFeePercent",
+            "offset": 0,
+            "slot": "155",
+            "type": "t_uint256",
+            "contract": "MellowBits",
+            "src": "contracts/MellowBits.sol:25"
+          },
+          {
+            "label": "reflectionFeePercent",
+            "offset": 0,
+            "slot": "156",
+            "type": "t_uint256",
+            "contract": "MellowBits",
+            "src": "contracts/MellowBits.sol:26"
+          },
+          {
+            "label": "delta",
+            "offset": 0,
+            "slot": "157",
+            "type": "t_uint256",
+            "contract": "MellowBits",
+            "src": "contracts/MellowBits.sol:28"
+          },
+          {
+            "label": "bitsBalance",
+            "offset": 0,
+            "slot": "158",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "contract": "MellowBits",
+            "src": "contracts/MellowBits.sol:58"
+          },
+          {
+            "label": "bitsSupply",
+            "offset": 0,
+            "slot": "159",
+            "type": "t_mapping(t_address,t_uint256)",
+            "contract": "MellowBits",
+            "src": "contracts/MellowBits.sol:61"
+          }
+        ],
+        "types": {
+          "t_address": {
+            "label": "address",
+            "numberOfBytes": "20"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]",
+            "numberOfBytes": "1568"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]",
+            "numberOfBytes": "1600"
+          },
+          "t_bool": {
+            "label": "bool",
+            "numberOfBytes": "1"
+          },
+          "t_contract(IFeeReader)2418": {
+            "label": "contract IFeeReader",
+            "numberOfBytes": "20"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))",
+            "numberOfBytes": "32"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)",
+            "numberOfBytes": "32"
+          },
+          "t_uint256": {
+            "label": "uint256",
+            "numberOfBytes": "32"
+          },
+          "t_uint8": {
+            "label": "uint8",
+            "numberOfBytes": "1"
+          }
+        }
+      }
+    }
+  }
+}

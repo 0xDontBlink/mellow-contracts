@@ -6,7 +6,6 @@ import {FeeReaderErrorCodes} from "./FeeReaderErrorCodes.sol";
 pragma solidity ^0.8.20;
 
 /**
- * @author addo_xyz
  * @notice Bonding curve logic for a linear curve, where each buy/sell changes spot price by adding/substracting delta
  */
 contract FeeReader is FeeReaderErrorCodes {
